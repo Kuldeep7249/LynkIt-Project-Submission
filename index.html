@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lynkit - Orchestrating Efficiency</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-orange': '#FF6B35',
+                        'dark-orange': '#E55A2B',
+                    },
+                    fontFamily: {
+                        'syne': ['Syne', 'sans-serif'],
+                        'outfit': ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 1; transform: translateY(40px); }
+            to { opacity: 0; transform: translateY(0); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+        @keyframes slideInFromRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInFromLeft {
+            from { opacity: 0; transform: translateX(-100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .animate-slideDown { animation: slideDown 0.6s ease-out; }
+        .animate-fadeIn { animation: fadeIn 1s ease-out; }
+        .animate-fadeInUp { animation: fadeInUp 1s ease-out; }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-bounce-slow { animation: bounce 2s ease-in-out infinite; }
+        .animate-slideInRight { animation: slideInFromRight 0.8s ease-out; }
+        .animate-slideInLeft { animation: slideInFromLeft 0.8s ease-out; }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #FF6B35 0%, #FFA07A 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .hero-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            filter: brightness(1) contrast(1);
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        
+        .hero-video.active {
+            opacity: 1;
+        }
+        
+        .video-fade {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                rgba(0, 0, 0, 0.88) 0%,
+                rgba(0, 0, 0, 0.65) 35%,
+                rgba(0, 0, 0, 0.4) 65%,
+                rgba(0, 0, 0, 0.2) 85%,
+                transparent 100%
+            );
+        }
+        
+        .content-glow {
+            position: relative;
+        }
+        
+        .content-glow::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: -10%;
+            width: 60%;
+            height: 140%;
+            background: radial-gradient(ellipse at center, rgba(255, 107, 53, 0.18) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .slide-content {
+            display: none;
+        }
+        
+        .slide-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="font-outfit bg-black text-white overflow-x-hidden">
+
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-lg border-b border-white/5 animate-slideDown">
+        <div class="max-w-[1600px] mx-auto px-8 lg:px-16 flex justify-between items-center h-20">
+            <a href="#" class="flex items-center gap-3 group">
+                <div>
+                    <img src="https://lynkit.in/static/media/lynkit.b2a96ca45ae69899347a.png" alt="" class="h-10 w-auto">
+                </div>
+            </a>
+            
+            
+            <ul class="hidden lg:flex items-center gap-10">
+                <li><a href="#" class="text-primary-orange font-medium tracking-wide hover:text-primary-orange transition-colors relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:right-0 after:h-0.5 after:bg-primary-orange">HOME</a></li>
+                <li><a href="#" class="text-white font-medium tracking-wide hover:text-primary-orange transition-colors">PRODUCTS</a></li>
+                <li><a href="#" class="text-white font-medium tracking-wide hover:text-primary-orange transition-colors">FOR ENTERPRISE</a></li>
+                <li><a href="#" class="text-white font-medium tracking-wide hover:text-primary-orange transition-colors">COMPANY</a></li>
+                <li><a href="#" class="text-white font-medium tracking-wide hover:text-primary-orange transition-colors">KNOWLEDGE BANK</a></li>
+                <li><a href="#" class="text-white font-medium tracking-wide hover:text-primary-orange transition-colors">API</a></li>
+                <li><a href="#" class="text-white font-medium tracking-wide hover:text-primary-orange transition-colors">PATENTS</a></li>
+                <li><a href="" class="text-white font-medium tracking-wide hover:text-primary-orange transition-colors">DASHBOARD</a></li>
+
+            </ul>
+            
+            <button class="px-8 py-3 bg-primary-orange text-white rounded-full font-semibold uppercase tracking-wider text-sm hover:bg-dark-orange hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(255,107,53,0.4)] transition-all duration-300">
+                Contact Us
+            </button>
+        </div>
+    </nav>
+
+    <section class="relative h-screen flex items-center ">
+        
+        <div class="video-container">
+            
+            <video class="hero-video active" autoplay muted loop playsinline data-video="1">
+                <source src="https://lynkit.in/static/media/Hardware.882306635f1433f8d862.mp4" type="video/mp4">
+            </video>
+            
+            <video class="hero-video" muted loop playsinline data-video="2">
+                <source src="https://lynkit.in/static/media/visibility.dfdcf0733ddedd3d2fa8.mp4" type="video/mp4">
+            </video>
+            
+            <video class="hero-video" muted loop playsinline data-video="3">
+                <source src="https://lynkit.in/static/media/PMB_1%20(3).b07b0b3e2b9e79a19489.mp4" type="video/mp4">
+            </video>
+            
+            <div class="video-fade"></div>
+        </div>
+        
+        <div class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-transparent"></div>
+        
+
+        <div class="absolute top-[10%] right-[10%] w-[300px] h-[300px] rounded-full bg-gradient-radial from-primary-orange/20 to-transparent animate-float pointer-events-none"></div>
+        <div class="absolute bottom-[20%] right-[30%] w-[200px] h-[200px] rounded-full bg-gradient-radial from-primary-orange/20 to-transparent animate-float pointer-events-none" style="animation-delay: 2s;"></div>
+        <div class="absolute top-[60%] right-[5%] w-[150px] h-[150px] rounded-full bg-gradient-radial from-primary-orange/20 to-transparent animate-float pointer-events-none" style="animation-delay: 4s;"></div>
+        
+        <div class="relative z-10 max-w-[1600px] mx-auto px-8 lg:px-16 w-full">
+            <div class="max-w-4xl content-glow">
+                
+                <div class="slide-content active" data-slide="1">
+                    <a href="#" class="inline-block px-6 py-2.5 bg-primary-orange/15 border-2 border-primary-orange rounded-full text-primary-orange text-sm font-semibold tracking-wide mb-8 hover:bg-primary-orange/25 hover:-translate-y-0.5 transition-all duration-300 shadow-[0_0_30px_rgba(255,107,53,0.4)] animate-fadeIn">
+                        "Lynkit Secures Second Patent for Route and Load Optimisation Solution"
+                    </a>
+                    
+                    <h1 class="font-syne text-6xl lg:text-8xl font-bold leading-tight tracking-tight mb-8 gradient-text animate-fadeInUp" style="filter: drop-shadow(0 0 40px rgba(255, 107, 53, 0.6));">
+                        Orchestrating<br>Efficiency.
+                    </h1>
+                    
+                    <p class="text-xl lg:text-2xl text-gray-200 font-light leading-relaxed mb-12 max-w-2xl animate-fadeInUp" style="text-shadow: 0 4px 30px rgba(0, 0, 0, 1);">
+                        Digitally transforming the supply chain with IoT, Blockchain, AI, ML and AR
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-5 animate-fadeInUp">
+                        <a href="#" class="inline-flex items-center gap-3 px-10 py-4 bg-primary-orange text-white rounded-full font-semibold text-lg hover:bg-dark-orange hover:-translate-y-1 hover:shadow-[0_15px_50px_rgba(255,107,53,0.6)] transition-all duration-300 shadow-[0_4px_30px_rgba(255,107,53,0.5)] group">
+                            Explore Solutions
+                            <span class="group-hover:translate-x-1 transition-transform duration-300">→</span>
+                        </a>
+                        <a href="#" class="inline-flex items-center gap-3 px-10 py-4 bg-white/10 text-white rounded-full font-semibold text-lg border-2 border-white/30 hover:bg-white/20 hover:border-white/50 backdrop-blur-md transition-all duration-300">
+                            Watch Demo
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="slide-content" data-slide="2">
+                    <a href="#" class="inline-block px-6 py-2.5 bg-primary-orange/15 border-2 border-primary-orange rounded-full text-primary-orange text-sm font-semibold tracking-wide mb-8 hover:bg-primary-orange/25 hover:-translate-y-0.5 transition-all duration-300 shadow-[0_0_30px_rgba(255,107,53,0.4)]">
+                        "Revolutionizing Supply Chain Visibility with Real-Time IoT Integration"
+                    </a>
+                    
+                    <h1 class="font-syne text-7xl lg:text-8xl font-bold leading-tight tracking-tight mb-8 gradient-text" style="filter: drop-shadow(0 0 40px rgba(255, 107, 53, 0.6));">
+                        Smart Logistics<br>Redefined.
+                    </h1>
+                    
+                    <p class="text-xl lg:text-2xl text-gray-200 font-light leading-relaxed mb-12 max-w-2xl" style="text-shadow: 0 4px 30px rgba(0, 0, 0, 1);">
+                        End-to-end cargo tracking with GPS locks, sensors, and advanced analytics
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-5">
+                        <a href="#" class="inline-flex items-center gap-3 px-10 py-4 bg-primary-orange text-white rounded-full font-semibold text-lg hover:bg-dark-orange hover:-translate-y-1 hover:shadow-[0_15px_50px_rgba(255,107,53,0.6)] transition-all duration-300 shadow-[0_4px_30px_rgba(255,107,53,0.5)] group">
+                            View Products
+                            <span class="group-hover:translate-x-1 transition-transform duration-300">→</span>
+                        </a>
+                        <a href="#" class="inline-flex items-center gap-3 px-10 py-4 bg-white/10 text-white rounded-full font-semibold text-lg border-2 border-white/30 hover:bg-white/20 hover:border-white/50 backdrop-blur-md transition-all duration-300">
+                            Learn More
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="slide-content" data-slide="3">
+                    <a href="#" class="inline-block px-6 py-2.5 bg-primary-orange/15 border-2 border-primary-orange rounded-full text-primary-orange text-sm font-semibold tracking-wide mb-8 hover:bg-primary-orange/25 hover:-translate-y-0.5 transition-all duration-300 shadow-[0_0_30px_rgba(255,107,53,0.4)]">
+                        "Trusted by Leading Enterprises Across Multiple Industries"
+                    </a>
+                    
+                    <h1 class="font-syne text-7xl lg:text-8xl font-bold leading-tight tracking-tight mb-8 gradient-text" style="filter: drop-shadow(0 0 40px rgba(255, 107, 53, 0.6));">
+                        Innovation<br>Meets Security.
+                    </h1>
+                    
+                    <p class="text-xl lg:text-2xl text-gray-200 font-light leading-relaxed mb-12 max-w-2xl" style="text-shadow: 0 4px 30px rgba(0, 0, 0, 1);">
+                        Blockchain-powered transparency and AI-driven insights for your fleet
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-5">
+                        <a href="#" class="inline-flex items-center gap-3 px-10 py-4 bg-primary-orange text-white rounded-full font-semibold text-lg hover:bg-dark-orange hover:-translate-y-1 hover:shadow-[0_15px_50px_rgba(255,107,53,0.6)] transition-all duration-300 shadow-[0_4px_30px_rgba(255,107,53,0.5)] group">
+                            Get Started
+                            <span class="group-hover:translate-x-1 transition-transform duration-300">→</span>
+                        </a>
+                        <a href="#" class="inline-flex items-center gap-3 px-10 py-4 bg-white/10 text-white rounded-full font-semibold text-lg border-2 border-white/30 hover:bg-white/20 hover:border-white/50 backdrop-blur-md transition-all duration-300">
+                            Case Studies
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute bottom-16 left-8 lg:left-16 flex gap-3 z-20 animate-fadeIn" style="animation-delay: 1.2s; animation-fill-mode: backwards;">
+            <div class="indicator w-3 h-3 rounded-full bg-primary-orange cursor-pointer transition-all duration-300" data-slide="1" style="width: 40px; border-radius: 6px;"></div>
+            <div class="indicator w-3 h-3 rounded-full bg-white/30 hover:bg-white/50 cursor-pointer transition-all duration-300" data-slide="2"></div>
+            <div class="indicator w-3 h-3 rounded-full bg-white/30 hover:bg-white/50 cursor-pointer transition-all duration-300" data-slide="3"></div>
+        </div>
+        
+        <div class="absolute bottom-16 right-8 lg:right-16 flex gap-2.5 animate-fadeIn flex-wrap max-w-[200px] lg:max-w-none" style="animation-delay: 1.4s; animation-fill-mode: backwards;">
+            <div class="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-gray-400 hover:bg-primary-orange/10 hover:border-primary-orange hover:text-primary-orange hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
+                IoT
+            </div>
+            <div class="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-gray-400 hover:bg-primary-orange/10 hover:border-primary-orange hover:text-primary-orange hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
+                Blockchain
+            </div>
+            <div class="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-gray-400 hover:bg-primary-orange/10 hover:border-primary-orange hover:text-primary-orange hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
+                AI/ML
+            </div>
+            <div class="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-gray-400 hover:bg-primary-orange/10 hover:border-primary-orange hover:text-primary-orange hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
+                AR
+            </div>
+        </div>
+        
+        
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2.5 text-gray-400 text-xs animate-bounce-slow cursor-pointer scroll-indicator">
+            <span class="tracking-widest">SCROLL</span>
+            <div class="w-6 h-6 border-l-2 border-b-2 border-primary-orange transform rotate-[-45deg]"></div>
+        </div>
+    </section>
+
+    <script>
+        const indicators = document.querySelectorAll('.indicator');
+        const videos = document.querySelectorAll('.hero-video');
+        const slideContents = document.querySelectorAll('.slide-content');
+        let currentSlide = 0;
+        let autoPlayInterval;
+
+        function switchSlide(slideIndex) {
+
+            indicators.forEach((ind, idx) => {
+                if (idx === slideIndex) {
+                    ind.classList.remove('bg-white/30');
+                    ind.classList.add('bg-primary-orange');
+                    ind.style.width = '40px';
+                    ind.style.borderRadius = '6px';
+                } else {
+                    ind.classList.remove('bg-primary-orange');
+                    ind.classList.add('bg-white/30');
+                    ind.style.width = '12px';
+                    ind.style.borderRadius = '50%';
+                }
+            });
+
+            videos.forEach((video, idx) => {
+                if (idx === slideIndex) {
+                    video.classList.add('active');
+                    video.play();
+                } else {
+                    video.classList.remove('active');
+                    video.pause();
+                }
+            });
+
+            slideContents.forEach((content, idx) => {
+                if (idx === slideIndex) {
+                    content.classList.add('active');
+                    content.style.animation = 'none';
+                    setTimeout(() => {
+                        content.style.animation = 'fadeInUp 0.8s ease-out';
+                    }, 10);
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+
+            currentSlide = slideIndex;
+        }
+
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                clearInterval(autoPlayInterval);
+                switchSlide(index);
+                startAutoPlay();
+            });
+        });
+
+        function startAutoPlay() {
+            autoPlayInterval = setInterval(() => {
+                currentSlide = (currentSlide + 1) % indicators.length;
+                switchSlide(currentSlide);
+            }, 8000);
+        }
+
+        startAutoPlay();
+        document.addEventListener('mousemove', (e) => {
+            const floatingElements = document.querySelectorAll('.animate-float');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            floatingElements.forEach((element, index) => {
+                const speed = (index + 1) * 15;
+                element.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+            });
+        });
+
+        document.querySelector('.scroll-indicator').addEventListener('click', () => {
+            window.scrollBy({
+                top: window.innerHeight,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+</html>

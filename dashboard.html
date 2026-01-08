@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lynktrac Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-15px) rotate(3deg);
+            }
+        }
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.4);
+                opacity: 0;
+            }
+        }
+        .animate-slide-down {
+            animation: slideDown 0.6s ease-out;
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-500 { animation-delay: 0.5s; }
+        .delay-600 { animation-delay: 0.6s; }
+        
+        .stat-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .trip-card {
+            transition: all 0.3s ease;
+        }
+        .trip-card:hover {
+            transform: translateX(8px);
+        }
+        
+        .pulse-ring {
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #FF6B35;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #E55A2B;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'orange-primary': '#FF6B35',
+                        'orange-light': '#FF8C42',
+                        'orange-dark': '#E55A2B',
+                        'grey-dark': '#2C2C2C',
+                        'grey-medium': '#4A4A4A',
+                        'grey-light': '#E8E8E8',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    
+    <header class="bg-gradient-to-r from-grey-dark to-black text-white sticky top-0 z-50 shadow-2xl animate-slide-down">
+        <div class="max-w-[1600px] mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-8">
+                <h1 class="text-3xl font-extrabold tracking-tight">
+                    Lynk<span class="text-orange-primary">trac</span>
+                </h1>
+                <nav class="hidden md:flex gap-6">
+                    <a href="#" class="text-sm font-medium hover:text-orange-primary transition-colors">Dashboard</a>
+                    <a href="#" class="text-sm font-medium text-gray-400 hover:text-orange-primary transition-colors">Trips</a>
+                    <a href="#" class="text-sm font-medium text-gray-400 hover:text-orange-primary transition-colors">Vehicles</a>
+                    <a href="#" class="text-sm font-medium text-gray-400 hover:text-orange-primary transition-colors">Reports</a>
+                </nav>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <button class="relative p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-all hover:scale-105">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                    </svg>
+                    <span class="absolute top-2 right-2 w-4 h-4 bg-orange-primary rounded-full text-[10px] font-bold flex items-center justify-center">3</span>
+                </button>
+                
+                <div class="flex items-center gap-3 pl-4 border-l border-white/20">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-semibold">Kuldeep Singh</p>
+                        <p class="text-xs text-gray-400">Developer</p>
+                    </div>
+                    <div class="w-11 h-11 rounded-full bg-gradient-to-br from-orange-primary to-orange-light flex items-center justify-center font-bold text-lg border-2 border-white/30">
+                        RS
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1600px] mx-auto px-6 py-8">
+        
+        <div class="bg-gradient-to-r from-orange-primary via-orange-dark to-orange-primary text-white rounded-3xl p-8 mb-8 shadow-2xl relative overflow-hidden animate-fade-in-up">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 animate-float"></div>
+            <div class="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full -ml-24 -mb-24"></div>
+            
+            <div class="relative z-10">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-3xl font-extrabold mb-2">Welcome back, Kuldeep! 👋</h2>
+                        <p class="text-white/90 text-lg">Here's what's happening with your Account today</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button class="bg-white text-orange-primary px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-all hover:scale-105 shadow-lg">
+                            New Trip
+                        </button>
+                        <button class="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-xl font-semibold hover:bg-white/30 transition-all">
+                            Generate Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="stat-card bg-white rounded-2xl p-6 shadow-lg animate-fade-in-up delay-100">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <span class="text-xs font-semibold text-green-600 bg-green-50 px-3 py-1 rounded-full">Live</span>
+                </div>
+                <h3 class="text-3xl font-extrabold text-grey-dark mb-1">24</h3>
+                <p class="text-sm text-gray-500 font-medium">Active Trips</p>
+                <div class="mt-4 flex items-center text-xs">
+                    <span class="text-green-600 font-semibold">↑ 12%</span>
+                    <span class="text-gray-400 ml-2">vs last week</span>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-2xl p-6 shadow-lg animate-fade-in-up delay-200">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-gradient-to-br from-orange-primary to-orange-dark rounded-xl">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Available</span>
+                </div>
+                <h3 class="text-3xl font-extrabold text-grey-dark mb-1">156</h3>
+                <p class="text-sm text-gray-500 font-medium">Total Vehicles</p>
+                <div class="mt-4 flex items-center text-xs">
+                    <span class="text-blue-600 font-semibold">142 Active</span>
+                    <span class="text-gray-400 ml-2">• 14 Idle</span>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-2xl p-6 shadow-lg animate-fade-in-up delay-300">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <span class="text-xs font-semibold text-orange-600 bg-orange-50 px-3 py-1 rounded-full">Today</span>
+                </div>
+                <h3 class="text-3xl font-extrabold text-grey-dark mb-1">94.5%</h3>
+                <p class="text-sm text-gray-500 font-medium">On-Time Delivery</p>
+                <div class="mt-4 flex items-center text-xs">
+                    <span class="text-emerald-600 font-semibold">↑ 3.2%</span>
+                    <span class="text-gray-400 ml-2">improvement</span>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-2xl p-6 shadow-lg animate-fade-in-up delay-400">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-gradient-to-br from-red-500 to-red-600 rounded-xl">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                    <span class="text-xs font-semibold text-red-600 bg-red-50 px-3 py-1 rounded-full">Action Needed</span>
+                </div>
+                <h3 class="text-3xl font-extrabold text-grey-dark mb-1">7</h3>
+                <p class="text-sm text-gray-500 font-medium">Active Alerts</p>
+                <div class="mt-4 flex items-center text-xs">
+                    <span class="text-red-600 font-semibold">3 Critical</span>
+                    <span class="text-gray-400 ml-2">• 4 Medium</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-lg animate-fade-in-up delay-500">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-grey-dark">Live Trip Tracking</h3>
+                    <div class="flex gap-2">
+                        <button class="px-4 py-2 bg-orange-primary text-white rounded-lg text-sm font-semibold hover:bg-orange-dark transition-all">
+                            Map View
+                        </button>
+                        <button class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-all">
+                            List View
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl h-[450px] relative overflow-hidden">
+                    <div class="absolute inset-0" style="background-image: repeating-linear-gradient(0deg, #ddd 0px, #ddd 1px, transparent 1px, transparent 20px), repeating-linear-gradient(90deg, #ddd 0px, #ddd 1px, transparent 1px, transparent 20px);">
+                        <img src="./image.png" alt="">
+                    </div>
+                    
+                    <div class="absolute top-1/4 left-1/4 w-8 h-8 bg-orange-primary rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
+                            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"></path>
+                        </svg>
+                        <div class="absolute w-12 h-12 bg-orange-primary rounded-full pulse-ring"></div>
+                    </div>
+                    
+                    <div class="absolute top-1/2 right-1/3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
+                            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"></path>
+                        </svg>
+                        <div class="absolute w-12 h-12 bg-blue-500 rounded-full pulse-ring"></div>
+                    </div>
+                    
+                    <div class="absolute bottom-1/4 left-1/2 w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
+                            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"></path>
+                        </svg>
+                        <div class="absolute w-12 h-12 bg-emerald-500 rounded-full pulse-ring"></div>
+                    </div>
+                    
+                    <svg class="absolute inset-0 w-full h-full" style="pointer-events: none;">
+                        <path d="M 25% 25% Q 40% 35%, 50% 50%" stroke="#FF6B35" stroke-width="3" fill="none" stroke-dasharray="10,5" opacity="0.6"/>
+                        <path d="M 66% 50% Q 60% 60%, 50% 75%" stroke="#3B82F6" stroke-width="3" fill="none" stroke-dasharray="10,5" opacity="0.6"/>
+                    </svg>
+                    
+                    <div class="absolute top-4 right-4 flex flex-col gap-2">
+                        <button class="p-3 bg-white rounded-lg shadow-lg hover:bg-gray-50 transition-all">
+                            <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </button>
+                        <button class="p-3 bg-white rounded-lg shadow-lg hover:bg-gray-50 transition-all">
+                            <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="absolute bottom-4 left-4 bg-white rounded-lg p-3 shadow-lg">
+                        <div class="flex items-center gap-4 text-xs font-medium">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-orange-primary rounded-full"></div>
+                                <span>On Route</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                <span>Delayed</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                                <span>Delivered</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-lg animate-fade-in-up delay-600">
+                <h3 class="text-xl font-bold text-grey-dark mb-6">Recent Alerts</h3>
+                
+                <div class="space-y-4 custom-scrollbar overflow-y-auto max-h-[450px]">
+                    <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg hover:bg-red-100 transition-all cursor-pointer">
+                        <div class="flex items-start gap-3">
+                            <div class="p-2 bg-red-500 rounded-lg">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-sm text-red-900">Vehicle MH02-1234 - Critical</p>
+                                <p class="text-xs text-red-700 mt-1">Engine temperature high. Immediate action required.</p>
+                                <p class="text-xs text-red-600 mt-2 font-medium">5 mins ago</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-amber-50 border-l-4 border-amber-500 rounded-lg hover:bg-amber-100 transition-all cursor-pointer">
+                        <div class="flex items-start gap-3">
+                            <div class="p-2 bg-amber-500 rounded-lg">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-sm text-amber-900">Trip TR-4523 Delayed</p>
+                                <p class="text-xs text-amber-700 mt-1">Expected delay of 45 mins due to traffic.</p>
+                                <p class="text-xs text-amber-600 mt-2 font-medium">18 mins ago</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg hover:bg-blue-100 transition-all cursor-pointer">
+                        <div class="flex items-start gap-3">
+                            <div class="p-2 bg-blue-500 rounded-lg">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-sm text-blue-900">Route Optimization Available</p>
+                                <p class="text-xs text-blue-700 mt-1">New route can save 2 hours on TR-4521.</p>
+                                <p class="text-xs text-blue-600 mt-2 font-medium">1 hour ago</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-lg hover:bg-emerald-100 transition-all cursor-pointer">
+                        <div class="flex items-start gap-3">
+                            <div class="p-2 bg-emerald-500 rounded-lg">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-sm text-emerald-900">Delivery Completed</p>
+                                <p class="text-xs text-emerald-700 mt-1">Trip TR-4510 delivered successfully on time.</p>
+                                <p class="text-xs text-emerald-600 mt-2 font-medium">2 hours ago</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-orange-50 border-l-4 border-orange-500 rounded-lg hover:bg-orange-100 transition-all cursor-pointer">
+                        <div class="flex items-start gap-3">
+                            <div class="p-2 bg-orange-primary rounded-lg">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-sm text-orange-900">Maintenance Due</p>
+                                <p class="text-xs text-orange-700 mt-1">Vehicle DL01-5678 maintenance in 3 days.</p>
+                                <p class="text-xs text-orange-600 mt-2 font-medium">3 hours ago</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg hover:bg-red-100 transition-all cursor-pointer">
+                        <div class="flex items-start gap-3">
+                            <div class="p-2 bg-red-500 rounded-lg">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-sm text-red-900">Geofence Breach</p>
+                                <p class="text-xs text-red-700 mt-1">Vehicle KA03-9876 left designated route.</p>
+                                <p class="text-xs text-red-600 mt-2 font-medium">4 hours ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="w-full mt-4 py-3 text-sm font-semibold text-orange-primary border-2 border-orange-primary rounded-xl hover:bg-orange-primary hover:text-white transition-all">
+                    View All Alerts
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <div class="bg-white rounded-2xl p-6 shadow-lg">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-grey-dark">Recent Trips</h3>
+                    <button class="text-sm font-semibold text-orange-primary hover:text-orange-dark transition-colors">
+                        View All →
+                    </button>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="trip-card p-4 border-2 border-gray-100 rounded-xl hover:border-orange-primary hover:shadow-md">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <p class="font-bold text-grey-dark font-mono text-sm">TR-4523</p>
+                                <p class="text-xs text-gray-500 mt-1">Vehicle: MH02-AB-1234</p>
+                            </div>
+                            <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">In Transit</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-gray-600 mb-2">
+                            <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="font-medium">Mumbai</span>
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                            <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="font-medium">Delhi</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4 text-xs">
+                                <span class="text-gray-500">Distance: <span class="font-semibold text-grey-dark">1,450 km</span></span>
+                                <span class="text-gray-500">ETA: <span class="font-semibold text-grey-dark">8 hrs</span></span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <div class="w-full bg-gray-200 rounded-full h-2" style="width: 80px;">
+                                    <div class="bg-gradient-to-r from-orange-primary to-orange-light h-2 rounded-full" style="width: 65%"></div>
+                                </div>
+                                <span class="text-xs font-semibold text-orange-primary ml-1">65%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="trip-card p-4 border-2 border-gray-100 rounded-xl hover:border-orange-primary hover:shadow-md">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <p class="font-bold text-grey-dark font-mono text-sm">TR-4522</p>
+                                <p class="text-xs text-gray-500 mt-1">Vehicle: KA05-CD-5678</p>
+                            </div>
+                            <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold">Completed</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-gray-600 mb-2">
+                            <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="font-medium">Bangalore</span>
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                            <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="font-medium">Chennai</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4 text-xs">
+                                <span class="text-gray-500">Distance: <span class="font-semibold text-grey-dark">350 km</span></span>
+                                <span class="text-gray-500">Delivered: <span class="font-semibold text-emerald-600">On Time</span></span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <div class="w-full bg-gray-200 rounded-full h-2" style="width: 80px;">
+                                    <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 h-2 rounded-full" style="width: 100%"></div>
+                                </div>
+                                <span class="text-xs font-semibold text-emerald-600 ml-1">100%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="trip-card p-4 border-2 border-gray-100 rounded-xl hover:border-orange-primary hover:shadow-md">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <p class="font-bold text-grey-dark font-mono text-sm">TR-4521</p>
+                                <p class="text-xs text-gray-500 mt-1">Vehicle: DL03-EF-9012</p>
+                            </div>
+                            <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">Delayed</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-gray-600 mb-2">
+                            <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="font-medium">Delhi</span>
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                            <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="font-medium">Jaipur</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4 text-xs">
+                                <span class="text-gray-500">Distance: <span class="font-semibold text-grey-dark">280 km</span></span>
+                                <span class="text-gray-500">Delay: <span class="font-semibold text-amber-600">45 mins</span></span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <div class="w-full bg-gray-200 rounded-full h-2" style="width: 80px;">
+                                    <div class="bg-gradient-to-r from-amber-400 to-amber-500 h-2 rounded-full" style="width: 40%"></div>
+                                </div>
+                                <span class="text-xs font-semibold text-amber-600 ml-1">40%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="trip-card p-4 border-2 border-gray-100 rounded-xl hover:border-orange-primary hover:shadow-md">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <p class="font-bold text-grey-dark font-mono text-sm">TR-4520</p>
+                                <p class="text-xs text-gray-500 mt-1">Vehicle: GJ01-GH-3456</p>
+                            </div>
+                            <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">Scheduled</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-gray-600 mb-2">
+                            <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="font-medium">Ahmedabad</span>
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                            <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="font-medium">Pune</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4 text-xs">
+                                <span class="text-gray-500">Distance: <span class="font-semibold text-grey-dark">660 km</span></span>
+                                <span class="text-gray-500">Starts: <span class="font-semibold text-grey-dark">Tomorrow</span></span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <div class="w-full bg-gray-200 rounded-full h-2" style="width: 80px;">
+                                    <div class="bg-gradient-to-r from-purple-400 to-purple-500 h-2 rounded-full" style="width: 0%"></div>
+                                </div>
+                                <span class="text-xs font-semibold text-purple-600 ml-1">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-lg">
+                <h3 class="text-xl font-bold text-grey-dark mb-6">Performance Overview</h3>
+
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-3">
+                        <p class="text-sm font-semibold text-gray-600">Weekly Trips</p>
+                        <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">↑ 15% vs last week</span>
+                    </div>
+                    <div class="flex items-end justify-between gap-2 h-40">
+                        <div class="flex-1 flex flex-col items-center gap-2">
+                            <div class="w-full bg-gradient-to-t from-orange-primary to-orange-light rounded-t-lg" style="height: 45%"></div>
+                            <span class="text-xs font-medium text-gray-500">Mon</span>
+                        </div>
+                        <div class="flex-1 flex flex-col items-center gap-2">
+                            <div class="w-full bg-gradient-to-t from-orange-primary to-orange-light rounded-t-lg" style="height: 65%"></div>
+                            <span class="text-xs font-medium text-gray-500">Tue</span>
+                        </div>
+                        <div class="flex-1 flex flex-col items-center gap-2">
+                            <div class="w-full bg-gradient-to-t from-orange-primary to-orange-light rounded-t-lg" style="height: 80%"></div>
+                            <span class="text-xs font-medium text-gray-500">Wed</span>
+                        </div>
+                        <div class="flex-1 flex flex-col items-center gap-2">
+                            <div class="w-full bg-gradient-to-t from-orange-primary to-orange-light rounded-t-lg" style="height: 55%"></div>
+                            <span class="text-xs font-medium text-gray-500">Thu</span>
+                        </div>
+                        <div class="flex-1 flex flex-col items-center gap-2">
+                            <div class="w-full bg-gradient-to-t from-orange-primary to-orange-light rounded-t-lg" style="height: 90%"></div>
+                            <span class="text-xs font-medium text-gray-500">Fri</span>
+                        </div>
+                        <div class="flex-1 flex flex-col items-center gap-2">
+                            <div class="w-full bg-gradient-to-t from-orange-primary to-orange-light rounded-t-lg" style="height: 70%"></div>
+                            <span class="text-xs font-medium text-gray-500">Sat</span>
+                        </div>
+                        <div class="flex-1 flex flex-col items-center gap-2">
+                            <div class="w-full bg-gradient-to-t from-orange-primary to-orange-light rounded-t-lg" style="height: 50%"></div>
+                            <span class="text-xs font-medium text-gray-500">Sun</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                            <p class="text-xs font-medium text-blue-900">Avg. Speed</p>
+                        </div>
+                        <p class="text-2xl font-extrabold text-blue-900">58 km/h</p>
+                        <p class="text-xs text-blue-700 mt-1">↑ 3 km/h from avg</p>
+                    </div>
+
+                    <div class="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p class="text-xs font-medium text-emerald-900">Fuel Efficiency</p>
+                        </div>
+                        <p class="text-2xl font-extrabold text-emerald-900">6.2 km/l</p>
+                        <p class="text-xs text-emerald-700 mt-1">Optimal range</p>
+                    </div>
+
+                    <div class="p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p class="text-xs font-medium text-orange-900">Total Distance</p>
+                        </div>
+                        <p class="text-2xl font-extrabold text-orange-900">12,450 km</p>
+                        <p class="text-xs text-orange-700 mt-1">This week</p>
+                    </div>
+
+                    <div class="p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                            <p class="text-xs font-medium text-purple-900">Active Drivers</p>
+                        </div>
+                        <p class="text-2xl font-extrabold text-purple-900">142</p>
+                        <p class="text-xs text-purple-700 mt-1">91% utilization</p>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <h4 class="text-sm font-bold text-grey-dark mb-3">Top Performers This Week</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between p-3 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg border border-yellow-200">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                    🥇
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-sm text-grey-dark">Amit Kumar</p>
+                                    <p class="text-xs text-gray-600">18 trips • 98% on-time</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-bold text-yellow-700">4,250 km</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                    🥈
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-sm text-grey-dark">Rajesh Singh</p>
+                                    <p class="text-xs text-gray-600">16 trips • 95% on-time</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-bold text-gray-700">3,890 km</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                    🥉
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-sm text-grey-dark">Suresh Patel</p>
+                                    <p class="text-xs text-gray-600">15 trips • 92% on-time</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-bold text-orange-700">3,560 km</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-grey-dark text-white mt-12 py-6">
+        <div class="max-w-[1600px] mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-gray-400">© 2024 Lynkit. All rights reserved.</p>
+                <div class="flex gap-6 text-sm text-gray-400">
+                    <a href="#" class="hover:text-orange-primary transition-colors">Support</a>
+                    <a href="#" class="hover:text-orange-primary transition-colors">Documentation</a>
+                    <a href="#" class="hover:text-orange-primary transition-colors">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
